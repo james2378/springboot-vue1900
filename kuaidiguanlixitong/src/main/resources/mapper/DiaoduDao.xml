@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DiaoduDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.cheliang_id as cheliangId
+        ,a.diaodu_start as diaoduStart
+        ,a.diaodu_end as diaoduEnd
+        ,a.diaodu_types as diaoduTypes
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DiaoduView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,cheliang.cheliang_name as cheliangName
+        ,cheliang.cheliang_leixing_types as cheliangLeixingTypes
+        ,cheliang.cheliang_number as cheliangNumber
+        ,cheliang.cheliang_content as cheliangContent
+        ,cheliang.cheliang_types as cheliangTypes
+
+        FROM diaodu  a
+        left JOIN cheliang cheliang ON a.cheliang_id = cheliang.id
+
+        <where>
+            <if test="params.cheliangId != null">
+                and a.cheliang_id = #{params.cheliangId}
+            </if>
+            <if test=" params.diaoduStart != '' and params.diaoduStart != null and params.diaoduStart != 'null' ">
+                and a.diaodu_start like CONCAT('%',#{params.diaoduStart},'%')
+            </if>
+            <if test=" params.diaoduEnd != '' and params.diaoduEnd != null and params.diaoduEnd != 'null' ">
+                and a.diaodu_end like CONCAT('%',#{params.diaoduEnd},'%')
+            </if>
+            <if test="params.diaoduTypes != null">
+                and a.diaodu_types = #{params.diaoduTypes}
+            </if>
+
+            <if test=" params.cheliangName != '' and params.cheliangName != null and params.cheliangName != 'null' ">
+                and cheliang.cheliang_name like CONCAT('%',#{params.cheliangName},'%')
+            </if>
+            <if test="params.cheliangLeixingTypes != null">
+                and cheliang.cheliang_leixing_types = #{params.cheliangLeixingTypes}
+            </if>
+
+            <if test=" params.cheliangNumber != '' and params.cheliangNumber != null and params.cheliangNumber != 'null' ">
+                and cheliang.cheliang_number like CONCAT('%',#{params.cheliangNumber},'%')
+            </if>
+            <if test=" params.cheliangContent != '' and params.cheliangContent != null and params.cheliangContent != 'null' ">
+                and cheliang.cheliang_content like CONCAT('%',#{params.cheliangContent},'%')
+            </if>
+            <if test="params.cheliangTypes != null">
+                and cheliang.cheliang_types = #{params.cheliangTypes}
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KuaidiListDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.kuaidi_id as kuaidiId
+        ,a.kuaidi_list_name as kuaidiListName
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KuaidiListView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,kuaidi.yonghu_id as yonghuId
+        ,kuaidi.kuaidi_number as kuaidiNumber
+        ,kuaidi.kuaidi_name as kuaidiName
+        ,kuaidi.kuaidi_money as kuaidiMoney
+        ,kuaidi.kuaidi_content as kuaidiContent
+        ,kuaidi.kuaidi_this_value as kuaidiThisValue
+        ,kuaidi.kuaidi_types as kuaidiTypes
+        ,kuaidi.insert_time as insertTime
+
+        FROM kuaidi_list  a
+        left JOIN kuaidi kuaidi ON a.kuaidi_id = kuaidi.id
+
+        <where>
+            <if test="params.kuaidiId != null">
+                and a.kuaidi_id = #{params.kuaidiId}
+            </if>
+            <if test=" params.kuaidiListName != '' and params.kuaidiListName != null and params.kuaidiListName != 'null' ">
+                and a.kuaidi_list_name like CONCAT('%',#{params.kuaidiListName},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test="params.yonghuId != null">
+                and kuaidi.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.kuaidiNumber != '' and params.kuaidiNumber != null and params.kuaidiNumber != 'null' ">
+                and kuaidi.kuaidi_number like CONCAT('%',#{params.kuaidiNumber},'%')
+            </if>
+            <if test=" params.kuaidiName != '' and params.kuaidiName != null and params.kuaidiName != 'null' ">
+                and kuaidi.kuaidi_name like CONCAT('%',#{params.kuaidiName},'%')
+            </if>
+            <if test="params.kuaidiMoneyStart != null ">
+                <![CDATA[  and kuaidi.kuaidi_money >= #{params.kuaidiMoneyStart}   ]]>
+            </if>
+            <if test="params.kuaidiMoneyEnd != null ">
+                <![CDATA[  and kuaidi.kuaidi_money <= #{params.kuaidiMoneyEnd}   ]]>
+            </if>
+            <if test=" params.kuaidiContent != '' and params.kuaidiContent != null and params.kuaidiContent != 'null' ">
+                and kuaidi.kuaidi_content like CONCAT('%',#{params.kuaidiContent},'%')
+            </if>
+            <if test=" params.kuaidiThisValue != '' and params.kuaidiThisValue != null and params.kuaidiThisValue != 'null' ">
+                and kuaidi.kuaidi_this_value like CONCAT('%',#{params.kuaidiThisValue},'%')
+            </if>
+            <if test="params.kuaidiTypes != null">
+                and kuaidi.kuaidi_types = #{params.kuaidiTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(kuaidi.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(kuaidi.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
